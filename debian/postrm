@@ -1,0 +1,24 @@
+#!/bin/sh
+
+set -e
+
+if [ "$1" = "purge" ]; then
+  . /usr/share/debconf/confmodule
+  RET=
+  db_get apt-fast/tmpdownloaddir
+  tmpdownloaddir="$RET"
+  RET=
+  db_get apt-fast/tmpdownloadlist
+  tmpdownloadlist="$RET"
+
+  if [ -d $tmpdownloaddir ]; then
+    find "$tmpdownloaddir" -maxdepth 1 -type f -delete
+    rmdir -p "$tmpdownloaddir" 2>/dev/null || true
+  fi
+  [ -f "$tmpdownloadlist" ] && rm "$tmpdownloadlist"
+  if [ -d "$(dirname "$tmpdownloadlist")" ]; then
+    rmdir -p "$(dirname "$tmpdownladlist")" 2>/dev/null || true
+  fi
+fi
+
+#DEBHELPER#

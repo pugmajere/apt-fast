@@ -1,0 +1,59 @@
+Template: apt-fast/downloader
+Type: select
+# Translators: aria2c is a download accelerator and does not have to be
+# translated. 'custom' is a choice where users can manually add a download
+# helper command.
+__Choices: aria2c, custom
+Default: aria2c
+_Description: Download helper selection:
+
+Template: apt-fast/downloadcmd
+Type: string
+Default: aria2c -c -j ${_MAXNUM} -x ${_MAXNUM} -s ${_MAXNUM} --min-split-size=1M -i ${DLLIST} --connect-timeout=600 --timeout=600 -m0
+# Translators: ${_MAXNUM} (maximum number of parallel connections) (optional)
+# and ${DLLIST} (file with package URIs) (mandatory) are variables in config
+# file which may be used for download helper command,
+# e.g. 'aria2c -c -j ${_MAXNUM} -i ${DLLIST}'
+_Description: Download helper command line:
+ \${_MAXNUM} as maximum number of parallel connections and \${DLLIST} as
+ temporary download list file may given by configuration file.
+
+Template: apt-fast/maxdownloads
+Type: string
+Default: 5
+_Description: Maximum number of connections:
+ Stored in \${_MAXNUM} variable.
+
+Template: apt-fast/aptmanager
+Type: select
+Choices: apt-get, aptitude
+Default: apt-get
+_Description: Package manager to install and remove software:
+
+Template: apt-fast/tmpdownloaddir
+Type: string
+Default: /var/cache/apt/archives/apt-fast
+# Translators: This is the directory where the download helper downloads
+# packages before apt-fast moves them to the APT package cache.
+_Description: Temporary download folder:
+
+Template: apt-fast/tmpdownloadlist
+Type: string
+Default: /tmp/apt-fast.list
+# Translators: This is the file where APT exports the URIs of packages e.g.
+# http://foo.org/debian/pool/main/f/foo/foo_1.0_i386.deb to pass it to the
+# download helper.
+_Description: Temporary download list file:
+ Stored in \${DLLIST} variable.
+
+Template: apt-fast/aptcache
+Type: string
+Default: /var/cache/apt/archives
+_Description: Directory where APT stores package cache:
+
+Template: apt-fast/dlflag
+Type: boolean
+Default: false
+_Description: Suppress apt-fast confirmation dialog?
+ This does not affect package manager dialog but download installable
+ packages before package manager confirmation.

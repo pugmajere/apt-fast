@@ -1,0 +1,3 @@
+apt-fast /usr/sbin/
+apt-fast.conf /etc/
+completions/zsh/_apt-fast /usr/share/zsh/functions/Completion/Debian/

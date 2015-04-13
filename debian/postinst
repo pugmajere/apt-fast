@@ -1,0 +1,222 @@
+#!/usr/bin/perl -w
+
+# This package doesn't depend on perl, so make sure that everything done
+# in this script can be done with perl-base. In particular, using any
+# Perl modules other than the Debconf modules and the basic pragmata
+# probably isn't valid.
+
+use strict;
+use warnings;
+
+use Debconf::Client::ConfModule ':all';
+
+my $conffile="/etc/apt-fast.conf";
+
+my @valkeys = qw(_MAXNUM _APTMGR _DOWNLOADER DOWNLOADBEFORE DLDIR DLLIST APTCACHE);
+my %valhash = ();
+my @lines = ();
+
+# create directories recursively
+sub mkdir_p{
+  my $path = shift;
+  $path =~ s/^'(.*)'$/$1/ or $path =~ s/^"(.*)"$/$1/;  # remove quotes
+  my $tmppath = '';
+
+  for (split/\//,$path){
+    $tmppath .= $_ . "/";
+    if (! -d $tmppath){
+      mkdir $tmppath or return 0;
+    }
+  }
+  return 1;
+}
+
+# return name of directory
+sub dirname{
+  my $path = shift;
+  $path =~ s/^'(.*)'$/$1/ or $path =~ s/^"(.*)"$/$1/;  # remove quotes
+  return $path if ($path =~ s/([^\/]*)$//);
+}
+
+# search for first matching line
+sub checkline{
+  # $_[0] is $goodline
+  my $op = $_[1] || '';
+  for my $line (sort {$a <=> $b} keys %{$valhash{"$op$_"}}){
+    next if $line == -1;  # skip registered value (it is temporary only)
+    #print "${op}found:$_:$line:$valhash{\"$op$_\"}{$line}\n";
+    $_[0] = $line if ($valhash{"$op$_"}{$line} eq $valhash{$_}{-1});
+    last if $_[0] > -1;  # exit loop if good line found
+  }
+}
+
+# comment double or false lines and uncomment good line
+sub commentlines{
+  my $key = shift;
+  my $goodline = shift;
+  my $op = shift || '';
+  my $isset = 0;
+
+  for (sort {$a <=> $b} keys %{$valhash{"$op$key"}}){
+    next if $_ == -1;
+    if (! $isset && (($_ == $goodline) || ($goodline == -1))){
+      chomp $lines[$_];
+      # preserve comments beside values
+      my ($prespace, $comment) = '';
+      ($prespace, $comment) = ($1, $3) if $lines[$_] =~ /^([\s]*)[^=\s]+=([^\s][^#]*[^#\s]+|[^#\s]+|)(.*)$/;
+      #print "->||$_||$prespace$key=$valhash{$key}{-1}||$comment\n";
+      $lines[$_] = "$prespace$key=$valhash{$key}{-1}$comment\n";
+      $isset = 1;
+    }
+    else {
+      $lines[$_] = "#$lines[$_]" unless length $op;
+    }
+  }
+}
+
+if ((defined $ARGV[0]) && ($ARGV[0] eq "configure" || $ARGV[0] eq "reconfigure")){
+#=debconf
+  version('2.0') or die "Failed to start debconf.\n";
+
+  # get values from debconf database
+  $valhash{_DOWNLOADER}{-1}    = "'" . get("apt-fast/downloadcmd") . "'";
+  $valhash{_MAXNUM}{-1}        = get("apt-fast/maxdownloads");
+  $valhash{_APTMGR}{-1}        = get("apt-fast/aptmanager");
+  $valhash{DOWNLOADBEFORE}{-1} = (get("apt-fast/dlflag") eq "true") ? "true" : "";
+  $valhash{DLDIR}{-1}          = "'" . get("apt-fast/tmpdownloaddir") . "'";
+  $valhash{DLLIST}{-1}         = "'" . get("apt-fast/tmpdownloadlist") . "'";
+  $valhash{APTCACHE}{-1}       = "'" . get("apt-fast/aptcache") . "'";
+#=cut
+=dummy
+  # dummy datas
+  $valhash{_DOWNLOADER}{-1}    = '\'cat ${DLLIST} | xargs -l1 axel -n ${_MAXNUM} -a\'';
+  $valhash{_MAXNUM}{-1}        = 10;
+  $valhash{_APTMGR}{-1}        = "apt-get";
+  $valhash{DOWNLOADBEFORE}{-1} = "";
+  $valhash{DLDIR}{-1}          = "\'/var/cache/apt/archives/apt-fast\'";
+  $valhash{DLLIST}{-1}         = "\'/tmp/apt-fast.list\'";
+  $valhash{APTCACHE}{-1}       =    "\'/var/cache/apt/archives\'";
+=cut
+
+  # create directories
+  unless(-d $valhash{DLDIR}{-1}){
+    mkdir_p $valhash{DLDIR}{-1}
+      or die "Could not create temporary download directory: $valhash{DLDIR}{-1}\n$!";
+  }
+  unless(-d &dirname($valhash{DLLIST}{-1})){
+    mkdir_p &dirname($valhash{DLLIST}{-1})
+      or die "Could not create temporary download list directory: $valhash{DLLIST}{-1}\n$!";
+  }
+  unless(-d $valhash{APTCACHE}{-1}){
+    mkdir_p $valhash{APTCACHE}{-1}
+      or die "Could not create APT cache directory: $valhash{APTCACHE}{-1}\n$!";
+  }
+
+  # parse config file and insert debconf values
+  if (-f $conffile){
+    open(CONF, $conffile) or die "Could not open config file: $conffile\n$!";
+    @lines = <CONF>;  # load config file
+    close(CONF);
+  }
+
+  # get interesting values and keys
+  #
+  # Structure of valhash:
+  #
+  #   Key              Line    Value
+  # ------------------------------------------
+  # _DOWNLOADER  =>  {  -1  => default value
+  #                            (determined with debconf questions)
+  #                      n  => value read from configfile
+  #                      m  => value read from configfile
+  #                     ...
+  #                  }
+  # #_DOWNLOADER =>  {   o  => commented value read from configfile
+  #  (commented keys     p  => commented value read from configfile
+  #   must not be       ...
+  #   defined)          (commented keys do not have default value)
+  #                  }
+  # _MAXNUM      =>  {  -1 => default value
+  #                     ...
+  #                  }
+  # #_MAXNUM     =>  {
+  #                     ...
+  #                  }
+  # ...
+  #
+  my $i = 0;  # line counter
+  for my $line (@lines){
+    chomp $line;
+    if ($line !~ /^[\s]*(# .*|##.*|#|)$/){  # omit empty or commented lines
+      my $tmpline = $line;
+      if ($tmpline =~ s/^[\s]*([^\s][^#]+)(.*)/$1/){ # get regular lines without comments
+        if ($tmpline =~ /([^=]*[^\s=]+)=([\s]*|[^\s]+.*)$/){ # split key and value
+          my ($val, $res) = ($1, $2);
+          $res =~ s/\s+$//;
+          $valhash{$val}{$i} = $res;
+          #print "$i||$val||$valhash{$val}{$i}||\n";
+        }
+        elsif ($line !~ /^[\s]*#/){
+          $line = "#$line";  # comment irregular lines
+        }
+      }
+    }
+    $line = "$line\n";
+    ++$i;
+  }
+
+  # do some magic with config file
+  # Check if value of key matches debconf registered value. If yes comment
+  # other lines. If not append key and value to config file.
+  # Preserve whitespaces before entry and comments after entry.
+  #FIXME: (quoted) '#' characters (within values) break parsing.
+  for (@valkeys){
+    my $goodline = -1;
+    if (keys %{$valhash{$_}} > 1){  # registered value {-1} is always available
+      #print "$_:$valhash{$_}\n";
+      &checkline($goodline);
+      # Check also values of simple commented lines (#key=value) if no
+      # matching value was found in uncommented lines.
+      if (($goodline == -1) && (defined $valhash{"#$_"})){
+        &checkline($goodline, "#");
+        if ($goodline > -1){
+          &commentlines($_, $goodline, "#");
+          &commentlines($_, -2);  # comment all uncommented lines
+        }
+        else {
+          &commentlines($_, $goodline);
+        }
+      }
+      else {
+        &commentlines($_, $goodline);
+      }
+    }
+    elsif (defined $valhash{"#$_"}){
+      #print "#$_:$valhash{\"#$_\"}\n";
+      &checkline($goodline, "#");
+      &commentlines($_, $goodline, "#");
+    }
+    else {
+      #print "$_:notfound\n";
+      push(@lines, "$_=$valhash{$_}{-1}\n"); # set to registered value and append to config file
+    }
+  }
+
+  # save new config file
+  open(CONFNEW, ">$conffile.dpkg-new")
+    or die "Unable to open temporary config file: $conffile.dpkg-new:\n$!";
+  print CONFNEW @lines;
+  close(CONFNEW)
+    or die "Unable to close $conffile.dpkg-new:\n$!";
+  rename ("$conffile.dpkg-new", "$conffile")
+    or die "Unable to rename config file $conffile:\n$!";
+}
+
+# run any additional debhelper commands
+open(CMD, "| sh") or die "Unable to run debhelper commands: $!\n";
+print CMD "set -e\nset -- " . join (" ", @ARGV) . "\n";
+print CMD <<'eof';
+#DEBHELPER#
+eof
+close CMD;
+exit $?>>8;

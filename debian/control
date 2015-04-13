@@ -1,0 +1,19 @@
+Source: apt-fast
+Section: admin
+Priority: optional
+Maintainer: Saikrishna Arcot <saiarcot895@gmail.com>
+XSBC-Original-Maintainer: Dominique Lasserre <lasserre.d@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), bash-completion, po-debconf
+Standards-Version: 3.9.5
+Homepage: https://github.com/ilikenwf/apt-fast.git
+Vcs-Git: https://github.com/ilikenwf/apt-fast.git
+Vcs-Browser: https://github.com/ilikenwf/apt-fast.git
+
+Package: apt-fast
+Architecture: all
+Depends: ${misc:Depends}, aria2
+Suggests: aptitude
+Description: shellscript wrapper for apt-get or aptitude
+ apt-fast is a shellscript wrapper for apt-get that can drastically improve apt
+ download times by downloading packages in parallel, with multiple connections
+ per package.

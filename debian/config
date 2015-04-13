@@ -1,0 +1,245 @@
+#!/usr/bin/perl -w
+
+# This package doesn't depend on perl, so make sure that everything done
+# in this script can be done with perl-base. In particular, using any
+# Perl modules other than the Debconf modules and the basic pragmata
+# probably isn't valid.
+
+use strict;
+use warnings;
+
+use Debconf::Client::ConfModule ':all';
+
+my $conffile="/etc/apt-fast.conf";
+$_ = '' for my ($aptmanager, $downloader, $downloadcmd, $maxdownloads,
+    $tmpdownloaddir, $tmpdownloadlist, $aptcache, $dlflag);
+my $ok;
+my $priority;
+my ($customcmd, $dl_list) = (0, 0);
+
+my $ariacmd = 'aria2c -c -j ${_MAXNUM} -x ${_MAXNUM} -s ${_MAXNUM} --min-split-size=1M -i ${DLLIST} --connect-timeout=600 --timeout=600 -m0';
+
+version('2.0') or die "Failed to start debconf.\n";
+
+# Check if aptitude is installed. If not set low priority to package manager
+# question.
+sub checkaptitude{
+  return 1 if (`which aptitude`);
+  return 0;
+}
+
+# default debconf question loop
+#NOTE: Keep this in sync with same method in postinst script.
+sub debconfloop{
+  my $ok = 0;
+  my $type = shift;
+  my $priority = shift;
+  my $val = shift || '';
+  my $switch = shift;  # optional switch to num or cmd
+
+  while (1){
+    if ((defined $switch) && ($switch eq "num")){
+      $val = '' unless ($val =~ /(^\d+$)/); # only allow numbers
+    }
+
+    if ((length ($val // '')) &&
+        ((! ((defined $switch) && ($switch eq "num"))) || ($val > 0)) &&
+        ((! ((defined $switch) && ($switch eq "cmd"))) || (`which $val`))){
+      last if $ok;
+      if (input($priority, "apt-fast/$type") eq "question will be asked"){
+        set("apt-fast/$type", $val);
+      }
+    }
+    else {
+      $priority = "high" unless (($priority eq "critical") or not $ok);
+      if (input($priority, "apt-fast/$type") eq "question will be asked"){
+        reset("apt-fast/$type");
+      }
+    }
+    go();
+    $val = get("apt-fast/$type");
+    $ok = 1;
+  }
+}
+
+
+# parse config file
+if (-f $conffile){
+  open(FILE, $conffile) or die "Could not open config file: $conffile\n$!";
+  while(<FILE>){
+    if (!/^[\s]*(#.*|)$/){  # omit empty or commented lines
+      #FIXME: (quoted) '#' characters (within values) break parsing.
+      if (/^[\s]*([^#]+)/){ # get regular lines without comments
+        my $line = $1;
+        chomp($line);
+        if ($line =~ /([^=]*[^\s=]+)=([\s]*|[^\s]+.*)$/){ # split key and value
+          my ($val, $res) = ($1, $2);
+          $res =~ s/\s+$//;
+          $res =~ s/^'(.*)'$/$1/ or $res =~ s/^"(.*)"$/$1/;  # remove quotes
+          #print STDERR "||$val||$res||\n";
+
+          if ($val eq "_MAXNUM"){
+            $maxdownloads = $res;
+          }
+          elsif ($val eq "_APTMGR"){
+            $aptmanager = $res;
+          }
+          elsif ($val eq "_DOWNLOADER"){
+            $downloadcmd = $res;
+          }
+          elsif ($val eq "DOWNLOADBEFORE"){
+            $dlflag = $res;
+          }
+          elsif ($val eq "DLDIR"){
+            $tmpdownloaddir = $res;
+          }
+          elsif ($val eq "DLLIST"){
+            $tmpdownloadlist = $res;
+          }
+          elsif ($val eq "APTCACHE"){
+            $aptcache = $res;
+          }
+        } else {die "Error parsing config file $conffile line $..\n";}
+      }
+    }
+  }
+  close(FILE);
+}
+
+
+# analyse parsed values and set questions with debconf
+# _APTMGR
+if (&checkaptitude) {
+  $priority = "high";
+}
+else {
+  $priority = "low";
+}
+&debconfloop("aptmanager", $priority, $aptmanager, "cmd");
+
+# _DOWNLOADER
+# downloader
+$ok = 0;
+# Compatibility check for upgrades from < 1.8.
+if (get("apt-fast/downloader") eq "axel") {
+  fset("apt-fast/downloader", "seen", "false");
+  fset("apt-fast/downloadcmd", "seen", "false");
+  $downloadcmd = "";
+  $priority = "high";
+}
+else {
+  $priority = "medium";
+}
+# Transition to new aria2c command
+if($downloadcmd eq 'aria2c -c -j ${_MAXNUM} -i ${DLLIST} --connect-timeout=600 --timeout=600 -m0') {
+  $downloadcmd = $ariacmd;
+}
+while (1){
+  if (length ($downloadcmd // '')){
+    last if $ok;
+    if ($downloadcmd eq $ariacmd){ # just a very simple comparison
+      if (input($priority, "apt-fast/downloader") eq "question will be asked"){
+        set("apt-fast/downloader", "aria2c");
+      }
+      ($downloadcmd, $downloader) = ($ariacmd, "aria2c");
+    }
+    else {
+      if (input($priority, "apt-fast/downloader") eq "question will be asked"){
+        set("apt-fast/downloader", "custom");
+      }
+      $downloader = "custom";
+    }
+  }
+  else {
+    ($downloadcmd, $downloader) = ($ariacmd, "aria2c");
+    $priority = "high" if $ok;
+    if (input($priority, "apt-fast/downloader") eq "question will be asked"){
+      set("apt-fast/downloader", $downloader);
+    }
+  }
+  go();
+  $downloader = get("apt-fast/downloader");
+  $ok = 1;
+}
+set("apt-fast/downloadcmd", $downloadcmd) unless ($downloader eq "custom");
+
+# downloadcmd
+$ok = 0;
+if ($downloader eq "aria2c"){
+  $downloadcmd = $ariacmd;
+}
+else {
+  $customcmd = 1; # remember if custom command is used
+}
+$priority = $customcmd ? "critical" : "low";
+while (1){
+  if (length ($downloadcmd // '')){
+    last if $ok;
+    if (input($priority, "apt-fast/downloadcmd") eq "question will be asked"){
+      set("apt-fast/downloadcmd", $downloadcmd);
+    }
+  }
+  else {
+    if ($downloader eq "aria2c"){
+      $downloadcmd = $ariacmd;
+    }
+    else {
+      ($downloadcmd, $downloader) = ($ariacmd, "aria2c");
+    }
+    $priority = "high" unless (($priority eq "critical") or not $ok);
+    if ((input($priority, "apt-fast/downloadcmd") eq "question will be asked")
+        # This is needed to fix LP #1064656 (endless loop if DEBIAN_PRIORITY is
+        # critical or frontend noninteractive).
+        or (fget("apt-fast/downloadcmd", "seen") eq "false")){
+      set("apt-fast/downloader", $downloader);
+      set("apt-fast/downloadcmd", $downloadcmd);
+    }
+  }
+  go();
+  $downloadcmd = get("apt-fast/downloadcmd");
+  $ok = 1;
+}
+
+# _MAXNUM
+# skip if it is not used in _DOWNLOADER
+if ($downloadcmd =~ /\${_MAXNUM}/){
+  &debconfloop("maxdownloads", $customcmd ? "critical" : "high", $maxdownloads, "num");
+}
+else {
+  set("apt-fast/maxdownloads", "");
+}
+
+# DLLIST
+$dl_list = 1 if ($downloadcmd ne $ariacmd);
+&debconfloop("tmpdownloadlist", ($customcmd or $dl_list) ? "critical" : "low", $tmpdownloadlist);
+
+# DOWNLOADBEFORE
+&debconfloop("dlflag", "high", $dlflag);
+
+# DLDIR
+&debconfloop("tmpdownloaddir", "low", $tmpdownloaddir);
+
+# APTCACHE
+# Set archive directory:
+my $archivedir = `apt-config shell var Dir::Cache::archives/d`;
+$archivedir =~ s/^var='(.+)'\n/$1/;
+
+$ok = 0;
+$priority = "low";
+while (1){
+  if (length ($aptcache // '')){
+    last if $ok;
+    if (input($priority, "apt-fast/aptcache") eq "question will be asked"){
+      set("apt-fast/aptcache", $aptcache);
+    }
+  }
+  else {
+    $priority = "high" if $ok;
+    if (input($priority, "apt-fast/aptcache") eq "question will be asked"){
+      set("apt-fast/aptcache", $archivedir);
+    }
+  }
+  go();
+  $aptcache = get("apt-fast/aptcache");
+  $ok = 1;
+}

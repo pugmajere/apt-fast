@@ -1,0 +1,5 @@
+# '/tmp/' is only used as variable name for download helper command.
+apt-fast: possibly-insecure-handling-of-tmp-files-in-maintainer-script
+
+# apt-fast/dlflag is used. Lintian has problems to detect it because of Perl.
+apt-fast: unused-debconf-template apt-fast/dlflag

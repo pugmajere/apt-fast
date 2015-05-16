@@ -1,0 +1,133 @@
+# Uyghur translation for apt-fast
+# Copyright (c) 2012 Rosetta Contributors and Canonical Ltd 2012
+# This file is distributed under the same license as the apt-fast package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: apt-fast\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-12-12 15:34+0100\n"
+"PO-Revision-Date: 2012-09-08 17:06+0000\n"
+"Last-Translator: Sahran <Unknown>\n"
+"Language-Team: Uyghur <ug@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2012-12-14 06:05+0000\n"
+"X-Generator: Launchpad (build 16369)\n"
+
+#. Type: select
+#. Choices
+#. Translators: aria2c is a download accelerator and does not have to be
+#. translated. 'custom' is a choice where users can manually add a download
+#. helper command.
+#: ../templates:1001
+msgid "aria2c"
+msgstr "aria2c"
+
+#. Type: select
+#. Choices
+#. Translators: aria2c is a download accelerator and does not have to be
+#. translated. 'custom' is a choice where users can manually add a download
+#. helper command.
+#: ../templates:1001
+msgid "custom"
+msgstr "ئىختىيارى"
+
+#. Type: select
+#. Description
+#: ../templates:1002
+msgid "Download helper selection:"
+msgstr "چۈشۈرۈش ياردەمچىسى تاللاش:"
+
+#. Type: string
+#. Description
+#. Translators: ${_MAXNUM} (maximum number of parallel connections) (optional)
+#. and ${DLLIST} (file with package URIs) (mandatory) are variables in config
+#. file which may be used for download helper command,
+#. e.g. 'aria2c -c -j ${_MAXNUM} -i ${DLLIST}'
+#: ../templates:2001
+msgid "Download helper command line:"
+msgstr "چۈشۈرۈش ياردەمچىسى بۇيرۇق قۇرى:"
+
+#. Type: string
+#. Description
+#. Translators: ${_MAXNUM} (maximum number of parallel connections) (optional)
+#. and ${DLLIST} (file with package URIs) (mandatory) are variables in config
+#. file which may be used for download helper command,
+#. e.g. 'aria2c -c -j ${_MAXNUM} -i ${DLLIST}'
+#: ../templates:2001
+msgid ""
+"\\${_MAXNUM} as maximum number of parallel connections and \\${DLLIST} as "
+"temporary download list file may given by configuration file."
+msgstr ""
+"\\${_MAXNUM} پاراللىل باغلىنىشنىڭ ئەڭ چوڭ قىممىتى، \\${DLLIST} سەپلىمە "
+"ھۆججەت ھاسىل قىلغان ۋاقىتلىق چۈشۈرۈش تىزىم ھۆججىتى."
+
+#. Type: string
+#. Description
+#: ../templates:3001
+msgid "Maximum number of connections:"
+msgstr "ئەڭ كۆپ باغلىنىش سانى:"
+
+#. Type: string
+#. Description
+#: ../templates:3001
+msgid "Stored in \\${_MAXNUM} variable."
+msgstr "\\${_MAXNUM}  دا ساقلانغان ئۆزگەرگۈچى."
+
+#. Type: select
+#. Description
+#: ../templates:4001
+msgid "Package manager to install and remove software:"
+msgstr "بوغچا باشقۇرغۇچ - يۇمشاق دېتال ئورنىتىش ۋە چىقىرىۋېتىش:"
+
+#. Type: string
+#. Description
+#. Translators: This is the directory where the download helper downloads
+#. packages before apt-fast moves them to the APT package cache.
+#: ../templates:5001
+msgid "Temporary download folder:"
+msgstr "ۋاقىتلىق چۈشۈرۈش مۇندەرىجىسى:"
+
+#. Type: string
+#. Description
+#. Translators: This is the file where APT exports the URIs of packages e.g.
+#. http://foo.org/debian/pool/main/f/foo/foo_1.0_i386.deb to pass it to the
+#. download helper.
+#: ../templates:6001
+msgid "Temporary download list file:"
+msgstr "ۋاقىتلىق چۈشۈرۈش تىزىمى ھۆججىتى:"
+
+#. Type: string
+#. Description
+#. Translators: This is the file where APT exports the URIs of packages e.g.
+#. http://foo.org/debian/pool/main/f/foo/foo_1.0_i386.deb to pass it to the
+#. download helper.
+#: ../templates:6001
+msgid "Stored in \\${DLLIST} variable."
+msgstr "\\${DLLIST} دا ساقلانغان ئۆزگەرگۈچى:"
+
+#. Type: string
+#. Description
+#: ../templates:7001
+msgid "Directory where APT stores package cache:"
+msgstr "APT بوغچا غەملەكنى ساقلايدىغان مۇندەرىجە:"
+
+#. Type: boolean
+#. Description
+#: ../templates:8001
+msgid "Suppress apt-fast confirmation dialog?"
+msgstr "apt-fast جەزملەش سۆزلەشكۈدىن ئاتلاپ كېتەمدۇ؟"
+
+#. Type: boolean
+#. Description
+#: ../templates:8001
+msgid ""
+"This does not affect package manager dialog but download installable "
+"packages before package manager confirmation."
+msgstr ""
+"بۇ بوغچا باشقۇرغۇچ سۆزلەشكۈگە تەسىر كۆرسەتمەيدۇ ئەمما بوغچا بىر تەرەپ "
+"قىلغۇچنى جەزملەشتىن ئىلگىرى ئورناتقىلى بولىدىغان بوغچىلارنى چۈشۈرىدۇ."

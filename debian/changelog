@@ -1,0 +1,325 @@
+apt-fast (1.8.3~120+git0b2a8b5-0~ryan1) UNRELEASED; urgency=medium
+
+  * Add Debian packaging.
+
+ -- Ryan Anderson <ryan@mythryan.internal.h4x0r5.com>  Sun, 12 Apr 2015 18:15:02 -0700
+
+apt-fast (1.8.3~119+git0b2a8b5-0ubuntu1~ppa1~vivid1) vivid; urgency=low
+
+  [ Peter Dave Hello ]
+  * Update README.md
+
+  [ Cal Leeming ]
+  * Added summary of commands for easy copy/paste
+  * typo
+
+  [ Niels Thykier ]
+  * Quote "$@" to preserve original quoting
+
+  [ Sam ]
+  * Clarify documentation wording and correct typos
+  * Correct typo with aria2c usage
+
+  [ Saikrishna Arcot ]
+
+  [ Ryan Anderson ]
+
+ -- Saikrishna Arcot <saiarcot895@gmail.com>  Thu, 12 Mar 2015 18:30:18 -0400
+
+apt-fast (1.8.3~108+git9e3d88c-0ubuntu1~ppa3~vivid1) vivid; urgency=low
+
+  * Update debian/config with new aria2c command.
+
+ -- Saikrishna Arcot <saiarcot895@gmail.com>  Sat, 27 Sep 2014 09:15:03 -0400
+
+apt-fast (1.8.3~108+git9e3d88c-0ubuntu1~ppa2~vivid1) vivid; urgency=low
+
+  * Make the package architecture-independent
+
+ -- Saikrishna Arcot <saiarcot895@gmail.com>  Sun, 21 Sep 2014 22:41:05 -0400
+
+apt-fast (1.8.3~108+git9e3d88c-0ubuntu1~ppa1~vivid1) vivid; urgency=low
+
+  [ Shlomi Fish ]
+  * Correct a typo.
+  * Remove trailing space.
+
+  [ Peter Dave Hello ]
+  * add -x parameter for aria2c to speed up downloading
+  * Update ppa info, refer to #58
+  * Update README.md
+  * add -x parameter for aria2c in apt-fast.conf (forgot in 95f79b1)
+  * add --min-split-size=1M parameter for aria2c to enhance parallel
+  * add -s parameter for aria2c to enhance parallel
+
+  [ Saikrishna Arcot ]
+
+ -- Saikrishna Arcot <saiarcot895@gmail.com>  Thu, 14 Aug 2014 10:19:49 -0400
+
+apt-fast (1.8.2-1) vivid; urgency=low
+
+  * New upstream build.
+    - Improved locking with almost only shell builtins. Thanks to maclarke!
+    - Support not available config file. Thanks to maclarke!
+  * Drop dependency: lockfile-progs
+  * Add README.Debian how to use axel instead of aria2 (with limited support
+    though).
+  * Bump standards version to 3.9.4.
+  * New debconf translations:
+    - Afrikaans (af) (Dawid de Jager)
+    - French (fr) (Nicolas Delvaux, Gisele Perreault, Kcchouette)
+    - Croatian (hr) (gogo)
+    - Italian (it) (Milo Casagrande)
+    - Malay (ms) (abuyop)
+    - Ukrainian (uk) (Yuri Chornoivan)
+    - Chinese (Traditional) (zh_TW) (Cheng-Chia Tseng)
+
+ -- Dominique Lasserre <lasserre.d@gmail.com>  Fri, 09 Aug 2013 01:25:23 +0200
+
+apt-fast (1.8.1-1) vivid; urgency=low
+
+  * New upstream build.
+    - Proper default / config file / environment variables handling.
+    - New MIRRORS option (see manpage).
+    - APT path buildings hardened.
+    - Checksum checks.
+  * axel support dropped.
+  * New debconf translation:
+    - Croatian (hr) (gogo)
+    - French (fr) (Kcchouette)
+    - Malay (ms) (abuyop)
+  * Fix pre-depends issue if no downloader already installed (-> debconf loop).
+    Thanks to Eric Morgan! LP: #1081710
+  * Fix apt-config path buildings.
+  * Fix debconf question priority (don't set it always to 'high').
+
+ -- Dominique Lasserre <lasserre.d@gmail.com>  Wed, 12 Dec 2012 16:08:39 +0100
+
+apt-fast (1.7.5-2) vivid; urgency=low
+
+  * Fix endless debconf loop of apt-fast/downloadcmd with priority critical or
+    noninteractive frontend. LP: #1064656
+    Thanks to ThorN for reporting this issue.
+  * New debconf translation:
+    - French (fr) (Nicolas Delvaux)
+
+ -- Dominique Lasserre <lasserre.d@gmail.com>  Tue, 09 Oct 2012 23:19:33 +0200
+
+apt-fast (1.7.5-1) vivid; urgency=low
+
+  * New upstream build.
+    * Add zsh auto completion.
+
+ -- Dominique Lasserre <dominique@gmail.com>  Tue, 25 Sep 2012 03:05:20 +0200
+
+apt-fast (1.7.4-2) vivid; urgency=low
+
+  * Move aria2 and axel to Pre-Depends because they are required in debconf
+    questions. Thanks to ActionParsnip for reporting this issue.
+  * New debconf translation:
+    - Afrikaans (af) (Dawid de Jager)
+
+ -- Dominique Lasserre <lasserre.d@gmail.com>  Thu, 20 Sep 2012 13:26:57 +0200
+
+apt-fast (1.7.4-1) vivid; urgency=low
+
+  * New upstream build.
+    - Add new option APT_FAST_TIMEOUT to set timeout of apt-fast download
+      confirmation dialog. Default is 60 seconds. LP: #1045765
+  * New debconf translation:
+    - Chinese (Traditional) (zh_TW) (Cheng-Chia Tseng)
+
+ -- Dominique Lasserre <lasserre.d@gmail.com>  Tue, 18 Sep 2012 19:36:47 +0200
+
+apt-fast (1.7.3-2) vivid; urgency=low
+
+  * Restart builders.
+
+ -- Dominique Lasserre <lasserre.d@gmail.com>  Thu, 13 Sep 2012 14:46:43 +0200
+
+apt-fast (1.7.3-1) vivid; urgency=low
+
+  * New upstream build.
+    - Consider environment variables (e.g. DOWNLOADBEFORE).
+    - Lockfile improvement.
+    - Copyright update.
+  * Fix some debconf related issues. Mainly to don't show prompts twice.
+    Thanks to Mike Doherty for reporting this issue. LP: #1046914
+  * Add new debconf question: Suppression of apt-fast confirmation dialog and
+    merge new and updated debconf translations:
+    - Arabic (ar) (nofallyaqoo)
+    - Asturian (ast) (Xuacu Saturio)
+    - Catalan (ca) (Alfredo Hernández)
+    - Chinese (Simplified) (zh_CN) (Tolbkni Kao, Wylmer Wang)
+    - Croatian (hr) (freedomrun)
+    - English (Australia) (en_AU) (Anthony Harrington)
+    - English (United Kingdom) (en_GB) (Alfredo Hernández)
+    - Galician (gl) (Miguel Anxo Bouzada)
+    - Greek (el) (tzem)
+    - Italian (it) (Milo Casagrande)
+    - Japanese (ja) (Shushi Kurose)
+    - Korean (ko) (MinSik CHO)
+    - Polish (pl) (Łukasz Wiśniewski)
+    - Spanish (es) (Alfredo Hernández)
+    - Turkish (tr) (Şâkir Aşçı)
+    - Ukrainian (uk) (Yuri Chornoivan)
+    - Uyghur (ug) (Sahran)
+
+ -- Dominique Lasserre <lasserre.d@gmail.com>  Thu, 13 Sep 2012 13:24:15 +0200
+
+apt-fast (1.7.2-1) vivid; urgency=low
+
+  * New upstream build.
+    - Support new option "changelog" to run without root permissions.
+    - Update bash completion (+download; +changelog).
+
+ -- Dominique Lasserre <lasserre.d@gmail.com>  Fri, 20 Jul 2012 23:21:46 +0200
+
+apt-fast (1.7.1-1) vivid; urgency=low
+
+  * New upstream build.
+    - Support new option "source". Update manpage.
+    - Allow non-root execution for "download" and "source" command.
+    - New lockfile management (lockfile-progs). New dependency: lockfile-progs
+  * Update patch manpage_version and rename it to manpage_debconf.
+
+ -- Dominique Lasserre <lasserre.d@gmail.com>  Tue, 10 Jul 2012 12:00:32 +0200
+
+apt-fast (1.6.7-2) vivid; urgency=high
+
+  * Make config file parsing Perl 5.10 compatible. LP: #1021633
+  * (Re)set default value of APTCACHE to system APT cache directory. Adjust
+    debconf priority to low.
+
+ -- Dominique Lasserre <lasserre.d@gmail.com>  Fri, 06 Jul 2012 22:58:37 +0200
+
+apt-fast (1.6.7-1) vivid; urgency=low
+
+  * New upstream build.
+    - Support new option "download". Update manpage.
+
+ -- Dominique Lasserre <lasserre.d@gmail.com>  Thu, 05 Jul 2012 22:15:15 +0200
+
+apt-fast (1.6.6-1) vivid; urgency=low
+
+  * New upstream build.
+    - Add man pages apt-fast(8) and apt-fast.conf(5) .
+  * Add patch manpage_version:
+    - Preserve current upstream version.
+    - Add comment about debconf configuration system.
+
+ -- Dominique Lasserre <lasserre.d@gmail.com>  Mon, 02 Jul 2012 19:54:08 +0200
+
+apt-fast (1.6.5-1) vivid; urgency=low
+
+  * New upstream build.
+    - If "assume yes" switch is enabled also enable $DOWNLODBEFORE.
+      LP: #1019431
+
+  * Remove warnings on first package installation and harden handling with
+    non-existing configuration file. LP: #1019043
+
+  * New debconf translations:
+    Thanks to all translators!
+
+    - Afrikaans (af) (Dawid de Jager)
+    - Arabic (ar) (Mohamed Alaa)
+    - Asturian (ast) (Xuacu Saturio)
+    - Bosnian (bs) (Kenan Dervišević)
+    - Brazilian Portuguese (pt_BR) (Rafael Neri)
+    - Bulgarian (bg) (spacy01)
+    - Catalan (ca) (Alfredo Hernández, VPablo)
+    - Chinese (Simplified) (zh_CN) (Tolbkni Kao, Wang Dianjin, ZhangCheng)
+    - Croatian (hr) (freedomrun)
+    - Dutch (nl) (Heber Dijks, Rachid)
+    - English (Australia) (en_AU) (Rafael Neri)
+    - English (Canada) (en_CA) (Rafael Neri)
+    - English (United Kingdom) (en_GB) (Alfredo Hernández, Flames_in_Paradise)
+    - French (fr) (Baptiste Fontaine, Nicolas Delvaux, Stanislas Michalak,
+      daufinsyd)
+    - Galician (gl) (Miguel Anxo Bouzada)
+    - Indonesian (id) (Hertatijanto Hartono)
+    - Italian (it) (Leonardo Corato, Milo Casagrande)
+    - Korean (ko) (MinSik CHO)
+    - Malay (ms) (inashdeen)
+    - Polish (pl) (Łukasz Wiśniewski)
+    - Portuguese (pt) (Rafael Neri)
+    - Russian (ru) (Oleg Koptev, mazai_f_kedah)
+    - Spanish (es) (Adolfo Jayme Barrientos, Alfredo Hernández)
+    - Ukrainian (uk) (Yuri Chornoivan)
+    - Uyghur (ug) (Sahran)
+
+    - Bengali (bn) (Mahay Alam Khan)
+    - Burmese (my) (Pyae Sone)
+    - Chinese (Traditional) (zh_TW) (Po-Chun Huang)
+    - Esperanto (eo) (Michael Moroni)
+    - Finnish (fi) (Jiri Grönroos)
+    - Greek (el) (tzem)
+    - Japanese (ja) (Kentaro Kazuhama, Shushi Kurose)
+    - Marathi (mr) (प्रसाद पाटील)
+    - Telugu (te) (Praveen Illa)
+    - Turkish (tr) (Sahran)
+    - Uzbek (uz) (Akmal Xushvaqov)
+
+ -- Dominique Lasserre <lasserre.d@gmail.com>  Sat, 30 Jun 2012 15:52:21 +0200
+
+apt-fast (1.6.4-2) vivid; urgency=low
+
+  * Introduce multilingual debconf interface to handle config file.
+    * New build dependency: po-debconf
+    * New binary dependencies: debconf (>= 0.5) | debconf-2.0
+
+ -- Dominique Lasserre <lasserre.d@gmail.com>  Thu, 21 Jun 2012 18:09:57 +0200
+
+apt-fast (1.6.4-1) vivid; urgency=low
+
+  * New upstream build.
+    - New supported downloadhelper option: build-dep
+    - Check if apt-fast is invoked over terminal if not colors are disabled
+    - Config file is loaded later to overwrite default settings (colors,
+      lockfile, etc.)
+    - Add default values to variables besides _DOWNLOADER.
+      Improved config file.
+    - Check for root earlier to load config file one single time.
+    - Pipe error messages to STDERR.
+    - `apt-fast clean` command also cleans apt-fast temporary files.
+    - Remove full-upgrade option.
+    - Add timeout of 20sec to user prompt.
+    - Some minor changes.
+  * Create special README.Debian (use upstream README as origin)
+
+ -- Dominique Lasserre <lasserre.d@gmail.com>  Tue, 19 Jun 2012 00:05:05 +0200
+
+apt-fast (1.6.3-1) vivid; urgency=low
+
+  * New upstream build.
+    - Simple check if option is known.
+
+ -- Dominique Lasserre <lasserre.d@gmail.com>  Mon, 18 Jun 2012 17:57:11 +0200
+
+apt-fast (1.6.2-1) vivid; urgency=low
+
+  * New upstream build.
+    - Only check for known options. Let package manager decide the rest.
+
+ -- Dominique Lasserre <lasserre.d@gmail.com>  Fri, 15 Jun 2012 11:27:37 +0200
+
+apt-fast (1.6.1-1) vivid; urgency=low
+
+  * New upstream build.
+    - Add update option.
+    - Remove -y as default ${_APTMGR} command.
+    - Default behavior of "If you want to download and install the files on
+      your System press Y else n to abort. [Y/n]" changed to "Yes, please
+      download".
+    - Check if _APTMGR is enabled and available.
+    - Add setting to skip download confirmation.
+    - Minor changes.
+
+ -- Dominique Lasserre <lasserre.d@gmail.com>  Thu, 14 Jun 2012 21:58:39 +0200
+
+apt-fast (1.6-1) vivid; urgency=low
+
+  * Initial release.
+
+ -- Dominique Lasserre <lasserre.d@gmail.com>  Mon, 11 Jun 2012 15:41:34 +0200

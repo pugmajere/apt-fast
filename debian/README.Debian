@@ -1,0 +1,19 @@
+FAQs:
+
+ 1. How to use axel instead of aria2?
+
+   axel support is gone with apt-fast 1.8.1 because axel does not support
+   following features:
+
+     - multiple mirrors per file
+     - continuation of partly downloaded files
+
+   But if you want to use axel anyway (and make sure you don't use the MIRRORS
+   option - which is disabled as default) you can simply set up the following
+   custom command:
+
+     cat "${DLLIST}" | xargs -l1 axel -n "${_MAXNUM}" -a
+
+   Either edit your config file /etc/apt-fast.conf manually or run
+    
+     dpkg-reconfigure apt-fast
